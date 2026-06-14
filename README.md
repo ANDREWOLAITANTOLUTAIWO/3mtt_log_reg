@@ -19,6 +19,11 @@ gdd = read_gd(url)
 
 df = pd.read_csv(gdd)
 
+## Missing Values
+# Check for missing values before imputation
+print("Missing values before imputation:")
+display(df.isnull().sum())
+
 ## Encode categorical predictors into a format suitable for Scikit-**learn**
 ### Converting all the categorical variables to dummy variables
 dfCat = pd.get_dummies(df[['Customer Type','Type of Travel','Class']])
@@ -27,6 +32,30 @@ dfCat
 ### Seperating the numerical variables
 dfNum = df[['Age','Flight Distance','Seat comfort','Departure/Arrival time convenient','Food and drink','Gate location','Inflight wifi service','Inflight entertainment', 'Online support', 'Ease of Online booking', 'On-board service', 'Leg room service', 'Baggage handling', 'Checkin service', 'Cleanliness', 'Online boarding', 'Departure Delay in Minutes', 'Arrival Delay in Minutes']]
 dfNum.shape
+
+## Relationship between Inflight entertainment and Satisfaction
+
+Let's visualize how 'Inflight entertainment' is related to 'satisfaction'.
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(8, 6))
+sns.boxplot(x='Inflight entertainment', y='satisfaction', data=df, hue='satisfaction', palette='viridis', legend=False)
+plt.title('Inflight Entertainment vs. Satisfaction')
+plt.xlabel('Inflight Entertainment Rating (0-5)')
+plt.ylabel('Satisfaction')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
+<img width="747" height="547" alt="log_reg_relationship" src="https://github.com/user-attachments/assets/98e8cd8e-9f8a-468b-8066-43b15f168b29" />
+
+The boxplot visualizes the relationship between 'Inflight entertainment' ratings and customer satisfaction. It clearly shows that:
+
+As the 'Inflight entertainment' rating increases (from 0 to 5), the proportion of 'satisfied' customers significantly rises.
+Customers who rated 'Inflight entertainment' highly (e.g., 4 or 5) are predominantly satisfied, with the median satisfaction level falling within the 'satisfied' category.
+Conversely, customers who rated 'Inflight entertainment' poorly (e.g., 0, 1, or 2) are more likely to be dissatisfied, with their median satisfaction skewing towards 'dissatisfied'.
+This visualization confirms 'Inflight entertainment' as a strong driver of customer satisfaction, aligning with its high positive coefficient found in the logistic regression model.
+
+
 
 ### Preparing the X variables
 X = pd.concat([dfCat, dfNum], axis=1)
@@ -121,8 +150,10 @@ The model is better at identifying truly 'satisfied' customers (higher recall fo
 22	Online boarding	-0.002954	0.002954
 2	Type of Travel_Business travel	0.002641	0.002641
 8	Flight Distance	-0.000430	0.000430
+25	Intercept	-0.190506	0.190506
 
 Features like Inflight entertainment, Class (Business vs. Eco), and Customer Type have the most significant impact on satisfaction, with higher positive coefficients indicating a strong positive correlation with satisfaction and higher negative coefficients indicating a strong negative correlation.
+The model coefficients, now including the intercept, have been successfully displayed and sorted by their absolute values. The Intercept has a coefficient of -0.190506.
 
 ## Business Recommendations for Improving Customer Satisfaction
 
